@@ -1,0 +1,235 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../js/**/*.vue';
+
+@theme {
+    --font-sans: 'Hind Siliguri', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-bengali: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+    
+    --color-brand-50: #EEF2FF;
+    --color-brand-100: #E0E7FF;
+    --color-brand-500: #6366F1;
+    --color-brand-600: #4F46E5;
+    --color-brand-700: #4338CA;
+
+    --color-accent-emerald: #10B981;
+    --color-accent-rose: #F43F5E;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background: #334155;
+}
+
+/* Anti-Cheat Content Protection Utility */
+.no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Book Sepia Theme Mode */
+.sepia-mode {
+    background-color: #FDF6E3 !important;
+    color: #433422 !important;
+}
+
+/* Textbook Double-Border Ribbon Header (Like BCS Books) */
+.book-header-ribbon {
+    text-align: center;
+    border: 3px double #1E293B;
+    background-color: #F8FAFC;
+    color: #0F172A;
+    font-weight: 800;
+    font-size: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    margin: 1.5rem 0;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    font-family: var(--font-bengali);
+}
+.dark .book-header-ribbon {
+    border-color: #64748B;
+    background-color: #0F172A;
+    color: #F8FAFC;
+}
+
+/* Sub-header Banner Box */
+.book-subheader-box {
+    text-align: center;
+    border: 2px solid #334155;
+    background-color: #EDF2F7;
+    color: #1E293B;
+    font-weight: 700;
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    border-radius: 0.375rem;
+    font-family: var(--font-bengali);
+}
+.dark .book-subheader-box {
+    border-color: #475569;
+    background-color: #1E293B;
+    color: #F1F5F9;
+}
+
+/* BCS Analysis Table (Book Style) */
+.bcs-analysis-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.25rem 0;
+    font-size: 0.9rem;
+    text-align: center;
+    font-family: var(--font-bengali);
+}
+.bcs-analysis-table th {
+    background-color: #CBD5E1;
+    color: #0F172A;
+    font-weight: 800;
+    border: 1px solid #64748B;
+    padding: 0.5rem;
+}
+.dark .bcs-analysis-table th {
+    background-color: #334155;
+    color: #F8FAFC;
+    border-color: #475569;
+}
+.bcs-analysis-table td {
+    border: 1px solid #94A3B8;
+    padding: 0.4rem 0.6rem;
+}
+.dark .bcs-analysis-table td {
+    border-color: #475569;
+}
+
+/* Math Formula & Fraction Callout Box */
+.math-formula-box {
+    background-color: #F1F5F9;
+    border-left: 4px solid #4F46E5;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    border-radius: 0.5rem;
+    font-family: var(--font-bengali);
+    font-weight: 600;
+}
+.dark .math-formula-box {
+    background-color: #1E293B;
+    border-left-color: #818CF8;
+}
+
+/* Book 2-Column Layout Grid */
+.book-2col {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+@media (min-width: 768px) {
+    .book-2col {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Book Reader Typography Styling */
+.prose-reading {
+    font-family: var(--font-bengali);
+    line-height: 1.95;
+    letter-spacing: 0.01em;
+}
+
+.prose-reading h1 {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: #312E81;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #E0E7FF;
+}
+
+.dark .prose-reading h1 {
+    color: #818CF8;
+    border-bottom-color: #312E81;
+}
+
+.prose-reading h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4338CA;
+    margin-top: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.dark .prose-reading h2 {
+    color: #A5B4FC;
+}
+
+.prose-reading h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1E1B4B;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.dark .prose-reading h3 {
+    color: #C7D2FE;
+}
+
+.prose-reading p {
+    font-size: 1.15rem;
+    margin-bottom: 1.25rem;
+    color: inherit;
+}
+
+.prose-reading strong {
+    color: #4F46E5;
+    font-weight: 800;
+    background-color: rgba(99, 102, 241, 0.08);
+    padding: 0.1em 0.3em;
+    border-radius: 0.25rem;
+}
+
+.dark .prose-reading strong {
+    color: #818CF8;
+    background-color: rgba(99, 102, 241, 0.2);
+}
+
+.prose-reading ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.prose-reading li {
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.prose-reading blockquote, .prose-reading .callout-box {
+    background-color: #EEF2FF;
+    border-left: 4px solid #4F46E5;
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    margin-top: 1rem;
+    margin-bottom: 1.25rem;
+    font-style: italic;
+}
+
+.dark .prose-reading blockquote, .dark .prose-reading .callout-box {
+    background-color: rgba(49, 46, 129, 0.4);
+    border-left-color: #818CF8;
+}
