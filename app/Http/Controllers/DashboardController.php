@@ -24,7 +24,19 @@ class DashboardController extends Controller
     public function index(): Response
     {
         $user = Auth::user();
-        $courses = Course::with(['chapters.exams'])->where('is_published', true)->get();
+        $courses = Course::with([
+            'chapters' => function($query) {
+                $query->whereNull('parent_id')
+                      ->where('is_published', true)
+                      ->orderBy('order_position', 'asc');
+            },
+            'chapters.exams',
+            'chapters.subChapters' => function($query) {
+                $query->where('is_published', true)
+                      ->orderBy('order_position', 'asc');
+            },
+            'chapters.subChapters.exams',
+        ])->where('is_published', true)->orderBy('order_position', 'asc')->get();
 
         foreach ($courses as $c) {
             foreach ($c->chapters as $ch) {
@@ -37,6 +49,18 @@ class DashboardController extends Controller
                         'negative_mark_value' => 0.25,
                     ]);
                     $ch->setRelation('exams', collect([$exam]));
+                }
+                foreach ($ch->subChapters as $subCh) {
+                    if ($subCh->exams->isEmpty()) {
+                        $exam = \App\Models\Exam::create([
+                            'chapter_id' => $subCh->id,
+                            'title' => "সাব-অধ্যায় পরীক্ষা: {$subCh->title}",
+                            'is_live' => true,
+                            'duration_minutes' => 15,
+                            'negative_mark_value' => 0.25,
+                        ]);
+                        $subCh->setRelation('exams', collect([$exam]));
+                    }
                 }
             }
         }

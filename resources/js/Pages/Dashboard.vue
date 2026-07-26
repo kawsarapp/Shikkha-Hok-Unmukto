@@ -226,7 +226,7 @@ const getCourseCompletionPercentage = (course) => {
                         <div
                             v-for="(chapter, idx) in subjectChapters"
                             :key="chapter.id"
-                            class="p-5 rounded-2xl border transition-all duration-200"
+                            class="p-5 rounded-2xl border transition-all duration-200 space-y-3"
                             :class="[
                                 progressMap[chapter.id]?.is_unlocked || idx === 0
                                     ? 'bg-gray-50/80 dark:bg-slate-900/50 border-gray-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500'
@@ -236,7 +236,7 @@ const getCourseCompletionPercentage = (course) => {
                             <div class="flex items-start justify-between">
                                 <div class="flex items-center space-x-3">
                                     <div
-                                        class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm"
+                                        class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0"
                                         :class="[
                                             progressMap[chapter.id]?.highest_score >= (chapter.passing_score_percentage || 70)
                                                 ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400'
@@ -246,10 +246,39 @@ const getCourseCompletionPercentage = (course) => {
                                         {{ idx + 1 }}
                                     </div>
                                     <div>
-                                        <h3 class="font-bold text-base text-gray-900 dark:text-slate-100">{{ chapter.title }}</h3>
+                                        <div class="flex items-center space-x-2">
+                                            <h3 class="font-bold text-base text-gray-900 dark:text-slate-100">{{ chapter.title }}</h3>
+                                            <!-- Importance Percentage Badge -->
+                                            <span class="px-2 py-0.5 bg-rose-50 text-rose-700 font-extrabold text-[10px] rounded-full border border-rose-200 flex-shrink-0">
+                                                🔥 {{ chapter.importance_percentage || 85 }}% গুরুত্বপূর্ণ
+                                            </span>
+                                        </div>
                                         <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                                             সর্বনিম্ন পড়া: {{ Math.round(chapter.min_reading_time_seconds / 60) }} মিনিট • পাসমার্ক: {{ chapter.passing_score_percentage }}%
                                         </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sub-Chapters Tree for Students -->
+                            <div v-if="chapter.sub_chapters?.length" class="pl-3 border-l-2 border-purple-300 dark:border-purple-800 space-y-2 pt-1">
+                                <div class="text-[11px] font-extrabold text-purple-700 dark:text-purple-400 uppercase tracking-wider">
+                                    📂 উপ-অধ্যায়সমূহ ({{ chapter.sub_chapters.length }}টি):
+                                </div>
+                                <div
+                                    v-for="subCh in chapter.sub_chapters"
+                                    :key="subCh.id"
+                                    class="p-2.5 bg-white dark:bg-slate-800 border border-purple-100 dark:border-slate-700 rounded-xl flex items-center justify-between gap-2 text-xs"
+                                >
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-bold text-gray-900 dark:text-slate-100">📌 {{ subCh.title }}</span>
+                                        <span class="px-1.5 py-0.5 bg-rose-50 text-rose-700 font-extrabold text-[9px] rounded-full">
+                                            🔥 {{ subCh.importance_percentage || 85 }}%
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <Link :href="`/chapter/${subCh.id}`" class="px-2 py-1 bg-indigo-50 text-indigo-600 font-bold text-[10px] rounded-lg">পড়া</Link>
+                                        <Link v-if="subCh.exams?.[0]" :href="`/exam/${subCh.exams[0].id}`" class="px-2 py-1 bg-emerald-600 text-white font-bold text-[10px] rounded-lg">পরীক্ষা</Link>
                                     </div>
                                 </div>
                             </div>
