@@ -12,6 +12,27 @@ const props = defineProps({
 
 const audioStore = useAudioStore();
 
+const shareText = computed(() => {
+    return encodeURIComponent(`আমি '${props.attempt?.exam?.title || 'বিসিএস কুইজ'}' এ ${props.attempt?.score} নম্বর পেয়েছি! তুমি কি আমাকে হারাতে পারবে? 🥊 চ্যালেঞ্জ নিতে লিংকে চাপ দাও:`);
+});
+
+const shareUrl = computed(() => {
+    return encodeURIComponent(window.location.href);
+});
+
+const shareToWhatsApp = () => {
+    window.open(`https://api.whatsapp.com/send?text=${shareText.value}%20${shareUrl.value}`, '_blank');
+};
+
+const shareToFacebook = () => {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${shareUrl.value}`, '_blank');
+};
+
+const copyChallengeLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    alert('🎯 আপনার ইউনিক চ্যালেঞ্জ লিংক কপি হয়েছে! বন্ধুদের যেকোনো চ্যাটে সেন্ড করুন।');
+};
+
 const playExplanationAudio = (questionText, explanation) => {
     audioStore.play('ব্যাখ্যা শুনুন', `${questionText}। সঠিক উত্তর ও কারণ: ${explanation}`);
 };
@@ -46,19 +67,35 @@ const playExplanationAudio = (questionText, explanation) => {
                 </div>
 
                 <!-- Score & Accuracy Breakdown Pill -->
-                <div class="flex items-center space-x-6 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10 shrink-0 z-10">
-                    <div class="text-center">
-                        <span class="block text-3xl font-black text-emerald-400">{{ attempt.score }}</span>
-                        <span class="text-xs text-gray-300">অর্জিত নম্বর</span>
+                <div class="flex flex-col items-center gap-4 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10 shrink-0 z-10">
+                    <div class="flex items-center space-x-6">
+                        <div class="text-center">
+                            <span class="block text-3xl font-black text-emerald-400">{{ attempt.score }}</span>
+                            <span class="text-xs text-gray-300">অর্জিত নম্বর</span>
+                        </div>
+                        <div class="w-px h-10 bg-white/20"></div>
+                        <div class="text-center">
+                            <span class="block text-xl font-bold text-emerald-400">{{ attempt.correct_count }}টি</span>
+                            <span class="text-xs text-gray-300">সঠিক উত্তর</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-xl font-bold text-rose-400">{{ attempt.wrong_count }}টি</span>
+                            <span class="text-xs text-gray-300">ভুল উত্তর</span>
+                        </div>
                     </div>
-                    <div class="w-px h-10 bg-white/20"></div>
-                    <div class="text-center">
-                        <span class="block text-xl font-bold text-emerald-400">{{ attempt.correct_count }}টি</span>
-                        <span class="text-xs text-gray-300">সঠিক উত্তর</span>
-                    </div>
-                    <div class="text-center">
-                        <span class="block text-xl font-bold text-rose-400">{{ attempt.wrong_count }}টি</span>
-                        <span class="text-xs text-gray-300">ভুল উত্তর</span>
+
+                    <!-- 1-Click Viral Challenge Friends Buttons -->
+                    <div class="w-full pt-3 border-t border-white/10 flex flex-wrap items-center justify-center gap-2">
+                        <span class="text-xs font-bold text-amber-300 w-full text-center">🥊 বন্ধুদের বিসিএস চ্যালেঞ্জ পাঠান:</span>
+                        <button @click="shareToWhatsApp" type="button" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs rounded-xl flex items-center space-x-1 shadow-md">
+                            <span>💬 WhatsApp শেয়ার</span>
+                        </button>
+                        <button @click="shareToFacebook" type="button" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl flex items-center space-x-1 shadow-md">
+                            <span>📘 Facebook শেয়ার</span>
+                        </button>
+                        <button @click="copyChallengeLink" type="button" class="px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white font-bold text-xs rounded-xl flex items-center space-x-1">
+                            <span>🔗 লিংক কপি</span>
+                        </button>
                     </div>
                 </div>
             </div>

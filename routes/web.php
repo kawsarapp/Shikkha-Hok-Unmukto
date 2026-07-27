@@ -56,6 +56,7 @@ Route::middleware(['auth', \App\Http\Middleware\EnforceSingleDeviceSession::clas
     Route::post('/api/reading-progress/ping', [ReadingProgressController::class, 'ping']);
     Route::post('/api/exam/autosave', [ExamController::class, 'autoSave']);
     Route::post('/api/ai/chat', [AiChatbotController::class, 'ask']);
+    Route::post('/api/ai/doubt', [AiChatbotController::class, 'askDoubt']);
 
     // Admin & Super Admin Management Routes
     Route::prefix('admin')->group(function () {

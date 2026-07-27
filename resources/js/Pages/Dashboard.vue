@@ -2,7 +2,10 @@
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, CheckCircle, Lock, Play, Sparkles, Award, ArrowRight, Layers, Flame, Coins, Clock, Filter, ChevronDown, ChevronRight, HelpCircle } from 'lucide-vue-next';
+import { useBrowserNotifications } from '@/Composables/useBrowserNotifications';
+import { BookOpen, CheckCircle, Lock, Play, Sparkles, Award, ArrowRight, Layers, Flame, Coins, Clock, Filter, ChevronDown, ChevronRight, HelpCircle, Bell } from 'lucide-vue-next';
+
+const { permission, requestPermission, triggerDailyStudyRoutineNotification } = useBrowserNotifications();
 
 const props = defineProps({
     courses: Array,
@@ -60,6 +63,36 @@ const getCourseCompletionPercentage = (course) => {
                     <p class="text-indigo-200 text-sm md:text-base leading-relaxed">
                         ভিডিওর পেছনে সময় নষ্ট না করে টেক্সট লেকচার, পেজ-বাই-পেজ পড়া, এআই অডিও এবং মেধা তালিকার লাইভ মডেল টেস্ট দিয়ে পূর্ণাঙ্গ প্রস্তুতি নিন।
                     </p>
+                </div>
+            </div>
+
+            <!-- Auto Study Routine & Browser Push Notifications Banner -->
+            <div class="p-5 bg-gradient-to-r from-purple-900/90 via-indigo-900/90 to-slate-900 text-white rounded-3xl border border-purple-500/30 flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg">
+                <div class="flex items-center space-x-3">
+                    <div class="p-3 bg-purple-500/20 rounded-2xl border border-purple-400/30 shrink-0">
+                        <Bell class="w-6 h-6 text-purple-300 animate-bounce" />
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-sm">🔔 দৈনিক স্বয়ংক্রিয় বিসিএস পড়ার রুটিন ও পুশ নোটিফিকেশন</h4>
+                        <p class="text-xs text-purple-200 mt-0.5">প্রতিদিন আপনার পড়ার টার্গেট ও কুইজ অনুশীলনের ব্রাউজার অ্যালার্ট পেতে নোটিফিকেশন চালু করুন</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 shrink-0">
+                    <button
+                        @click="triggerDailyStudyRoutineNotification"
+                        type="button"
+                        class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-extrabold rounded-xl shadow-md"
+                    >
+                        আজকের রুটিন দেখুন
+                    </button>
+                    <button
+                        v-if="permission !== 'granted'"
+                        @click="requestPermission"
+                        type="button"
+                        class="px-4 py-2 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-black rounded-xl shadow-md"
+                    >
+                        🔔 নোটিফিকেশন অন করুন
+                    </button>
                 </div>
             </div>
 

@@ -4,6 +4,7 @@ import { Link, usePage, router } from '@inertiajs/vue3';
 import WatermarkOverlay from '@/Components/WatermarkOverlay.vue';
 import ContentProtection from '@/Components/ContentProtection.vue';
 import AudioPlayer from '@/Components/AudioPlayer.vue';
+import AiTutorWidget from '@/Components/AiTutorWidget.vue';
 import { BookOpen, Trophy, ShieldCheck, Sun, Moon, LogOut, User as UserIcon, Flame, Settings, Coins, LayoutDashboard, Menu, X } from 'lucide-vue-next';
 
 const page = usePage();
@@ -219,6 +220,9 @@ onMounted(() => {
 
             <!-- Sticky Audio Player (Mounted Globally) -->
             <AudioPlayer />
+
+            <!-- 24/7 AI BCS Tutor Doubt Solver Widget (Mounted Globally) -->
+            <AiTutorWidget />
         </div>
     </ContentProtection>
 </template>
