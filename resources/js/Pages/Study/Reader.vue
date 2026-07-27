@@ -105,17 +105,55 @@ const sendMessage = async () => {
     }
 };
 
+// Scroll Progress Percentage State & Preloader Indicator
+const scrollPercentage = ref(0);
+
+const updateScrollProgress = () => {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const scrollHeight = (document.documentElement.scrollHeight || document.body.scrollHeight) - window.innerHeight;
+    if (scrollHeight > 0) {
+        scrollPercentage.value = Math.min(100, Math.max(0, Math.round((scrollTop / scrollHeight) * 100)));
+    } else {
+        scrollPercentage.value = 100;
+    }
+};
+
 onMounted(() => {
     pingInterval = setInterval(sendReadingPing, 60000);
+    window.addEventListener('scroll', updateScrollProgress);
+    updateScrollProgress();
 });
 
 onUnmounted(() => {
     if (pingInterval) clearInterval(pingInterval);
+    window.removeEventListener('scroll', updateScrollProgress);
 });
 </script>
 
 <template>
     <AppLayout>
+        <!-- Top Screen Fixed Reading Scroll Progress Bar -->
+        <div class="fixed top-0 left-0 right-0 z-[9999] h-1.5 bg-gray-200/40 dark:bg-slate-800/60 pointer-events-none">
+            <div
+                class="h-full bg-gradient-to-r from-teal-400 via-indigo-600 to-purple-600 transition-all duration-150 shadow-md shadow-indigo-500/50"
+                :style="{ width: scrollPercentage + '%' }"
+            ></div>
+        </div>
+
+        <!-- Floating Reading Progress Indicator Badge (Bottom Left) -->
+        <div class="fixed bottom-6 left-6 z-40 bg-slate-900/90 dark:bg-slate-800/95 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl shadow-2xl border border-slate-700/60 flex items-center space-x-3 text-xs font-bold transition-all">
+            <div class="relative w-9 h-9 flex items-center justify-center">
+                <svg class="w-9 h-9 transform -rotate-90" viewBox="0 0 36 36">
+                    <path class="text-slate-700 stroke-current" stroke-width="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path class="text-teal-400 stroke-current" stroke-width="3.5" :stroke-dasharray="`${scrollPercentage}, 100`" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <span class="absolute text-[10px] font-extrabold text-teal-300">{{ scrollPercentage }}%</span>
+            </div>
+            <div>
+                <div class="text-[11px] text-gray-200">পড়া সম্পন্ন: <span class="text-teal-400 font-extrabold">{{ scrollPercentage }}%</span></div>
+                <div class="text-[10px] text-gray-400">বাকি আছে: <span class="text-amber-300 font-extrabold">{{ 100 - scrollPercentage }}%</span></div>
+            </div>
+        </div>
         <div class="max-w-4xl mx-auto space-y-6">
             <!-- Reader Header -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-800 p-6 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-sm">

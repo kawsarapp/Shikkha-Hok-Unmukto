@@ -87,6 +87,7 @@ const createChapter = () => {
 };
 
 // Material Form & Formatting Toolbar Helper
+const richEditorRef = ref(null);
 const selectedChapterForMaterial = ref(null);
 const materialForm = useForm({
     chapter_id: '',
@@ -94,70 +95,104 @@ const materialForm = useForm({
     pdf_file_path: '',
 });
 
+const insertHtmlToEditor = (html) => {
+    if (richEditorRef.value?.insertHtmlAtCursor) {
+        richEditorRef.value.insertHtmlAtCursor(html);
+    } else {
+        materialForm.content += html;
+    }
+};
+
 const insertFormatting = (tag) => {
+    let snippet = '';
     switch (tag) {
         case 'h1':
-            materialForm.content += '\n# মূল শিরোনাম বা বিষয়...\n';
+            snippet = '\n<h1>মূল শিরোনাম বা বিষয়...</h1>\n';
             break;
         case 'h2':
-            materialForm.content += '\n## উপক্যাপশন বা পরিচ্ছেদ...\n';
+            snippet = '\n<h2>উপক্যাপশন বা পরিচ্ছেদ...</h2>\n';
             break;
         case 'bold':
-            materialForm.content += ' **গুরুত্বপূর্ণ তথ্য/সাল** ';
+            snippet = ' <strong>গুরুত্বপূর্ণ তথ্য/সাল</strong> ';
             break;
         case 'list':
-            materialForm.content += '\n- প্রথম পয়েন্ট\n- দ্বিতীয় পয়েন্ট\n- তৃতীয় পয়েন্ট\n';
+            snippet = '\n<ul><li>প্রথম পয়েন্ট</li><li>দ্বিতীয় পয়েন্ট</li><li>তৃতীয় পয়েন্ট</li></ul>\n';
             break;
         case 'alert':
-            materialForm.content += '\n> 💡 **বিশেষ নোট:** পরীক্ষার জন্য এই অংশটি অত্যন্ত গুরুত্বপূর্ণ।\n';
+            snippet = '\n<blockquote>💡 <strong>বিশেষ নোট:</strong> পরীক্ষার জন্য এই অংশটি অত্যন্ত গুরুত্বপূর্ণ।</blockquote>\n';
             break;
         case 'page':
-            materialForm.content += '\n\n---page---\n\n';
+            snippet = '\n<hr class="my-6 border-dashed" />\n';
             break;
         case 'book_ribbon':
-            materialForm.content += '\n<div class="book-header-ribbon">>>> পাটিগণিত <<<</div>\n<div class="book-subheader-box">বাস্তব সংখ্যা, গড়, ভগ্নাংশ, ল.সা.গু. ও গ.সা.গু.</div>\n';
+            snippet = '\n<div class="book-header-ribbon">>>> পাটিগণিত <<<</div>\n<div class="book-subheader-box">বাস্তব সংখ্যা, গড়, ভগ্নাংশ, ল.সা.গু. ও গ.সা.গু.</div>\n';
             break;
         case 'math_lcm':
-            materialForm.content += '\n<div class="math-formula-box">\n$$\\text{ভগ্নাংশের ল.সা.গু} = \\frac{\\text{লবগুলোর ল.সা.গু}}{\\text{হরগুলোর গ.সা.গু}}$$\n</div>\n';
+            snippet = '\n<div class="math-formula-box">\n$$\\text{ভগ্নাংশের ল.সা.গু} = \\frac{\\text{লবগুলোর ল.সা.গু}}{\\text{হরগুলোর গ.সা.গু}}$$\n</div>\n';
             break;
         case 'fraction':
-            materialForm.content += ' $$\\frac{২}{৫}$$ ';
+            snippet = ' $$\\frac{২}{৫}$$ ';
             break;
         case 'sqrt':
-            materialForm.content += ' $$\\sqrt{\\frac{৯}{৪}} = \\frac{৩}{২} = ১.৫$$ ';
+            snippet = ' $$\\sqrt{\\frac{৯}{৪}} = \\frac{৩}{২} = ১.৫$$ ';
             break;
         case 'bcs_grid':
-            materialForm.content += '\n<table class="bcs-analysis-table">\n  <thead>\n    <tr><th>বিসিএস পরীক্ষা</th><th>প্রশ্ন সংখ্যা</th><th>বিসিএস পরীক্ষা</th><th>প্রশ্ন সংখ্যা</th></tr>\n  </thead>\n  <tbody>\n    <tr><td>৫০তম বিসিএস</td><td>২টি</td><td>৪৯তম বিসিএস</td><td>১টি</td></tr>\n    <tr><td>৪৮তম বিসিএস</td><td>১টি</td><td>৪৭তম বিসিএস</td><td>২টি</td></tr>\n  </tbody>\n</table>\n';
+            snippet = '\n<table class="bcs-analysis-table">\n  <thead>\n    <tr><th>বিসিএস পরীক্ষা</th><th>প্রশ্ন সংখ্যা</th><th>বিসিএস পরীক্ষা</th><th>প্রশ্ন সংখ্যা</th></tr>\n  </thead>\n  <tbody>\n    <tr><td>৫০তম বিসিএস</td><td>২টি</td><td>৪৯তম বিসিএস</td><td>১টি</td></tr>\n    <tr><td>৪৮তম বিসিএস</td><td>১টি</td><td>৪৭তম বিসিএস</td><td>২টি</td></tr>\n  </tbody>\n</table>\n';
             break;
         case '2col':
-            materialForm.content += '\n<div class="book-2col">\n  <div>\n    <h4>১. বাম পাশের কলাম</h4>\n    <p>বাম পাশের টেক্সট ও কুইজ সমাধান...</p>\n  </div>\n  <div>\n    <h4>২. ডান পাশের কলাম</h4>\n    <p>ডান পাশের টেক্সট ও ব্যাখ্যা...</p>\n  </div>\n</div>\n';
+            snippet = '\n<div class="book-2col">\n  <div>\n    <h4>১. বাম পাশের কলাম</h4>\n    <p>বাম পাশের টেক্সট ও কুইজ সমাধান...</p>\n  </div>\n  <div>\n    <h4>২. ডান পাশের কলাম</h4>\n    <p>ডান পাশের টেক্সট ও ব্যাখ্যা...</p>\n  </div>\n</div>\n';
+            break;
+        case '3col_model_test':
+            snippet = `\n<div class="book-3col">\n  <div>\n    <h4 style="color:#0F766E; font-weight:bold;">১. বাংলা ভাষা ও সাহিত্য</h4>\n    <p><strong>১. 'চর্যাপদ' কত সালে আবিষ্কৃত হয়?</strong><br>(ক) ১৯০৫ (খ) ১৯০৭ (গ) ১৯১২ (ঘ) ১৯১৬</p>\n  </div>\n  <div>\n    <h4 style="color:#0F766E; font-weight:bold;">২. ইংরেজি সাহিত্য</h4>\n    <p><strong>২. Who wrote 'Hamlet'?</strong><br>(a) Milton (b) Shakespeare (c) Keats (d) Shelley</p>\n  </div>\n  <div>\n    <h4 style="color:#0F766E; font-weight:bold;">৩. বাংলাদেশ বিষয়াবলি</h4>\n    <p><strong>৩. সংবিধান দিবস কত তারিখে?</strong><br>(ক) ৪ নভেম্বর (খ) ১৬ ডিসেম্বর (গ) ২৬ মার্চ (ঘ) ১৭ এপ্রিল</p>\n  </div>\n</div>\n<div class="omr-answer-key-box">\n  <div class="omr-title">📝 ৩-কলাম বিসিএস মডেল টেস্ট উত্তরপত্র ও ব্যাখ্যা</div>\n  <div class="omr-grid">\n    <div><strong>১. (খ) ১৯০৭</strong> - মহামহোপাধ্যায় হরপ্রসাদ শাস্ত্রী নেপালের রাজদরবারের রয়্যাল লাইব্রেরি থেকে চর্যাপদ আবিষ্কার করেন।</div>\n    <div><strong>২. (b) Shakespeare</strong> - Hamlet is a tragedy written by William Shakespeare.</div>\n    <div><strong>৩. (ক) ৪ নভেম্বর</strong> - ১৯৭২ সালের ৪ নভেম্বর বাংলাদেশের সংবিধান গৃহীত হয়।</div>\n  </div>\n</div>\n`;
             break;
     }
+    if (snippet) insertHtmlToEditor(snippet);
 };
 
 // Graphical Table & Formula Builders (Zero Code Input!)
 const isEditorFullscreen = ref(false);
 const isTableBuilderOpen = ref(false);
-const tableRows = ref([
-    { exam1: '৫০তম বিসিএস', count1: '২টি', exam2: '৪৯তম বিসিএস', count2: '১টি' },
-    { exam1: '৪৮তম বিসিএস', count1: '১টি', exam2: '৪৭তম বিসিএস', count2: '২টি' },
+const tableHeaders = ref(['বিসিএস পরীক্ষা', 'প্রশ্ন সংখ্যা', 'বিসিএস পরীক্ষা', 'প্রশ্ন সংখ্যা']);
+const tableMatrix = ref([
+    ['৫০তম বিসিএস', '২টি', '৪৯তম বিসিএস', '১টি'],
+    ['৪৮তম বিসিএস', '১টি', '৪৭তম বিসিএস', '২টি'],
 ]);
 
-const addTableRow = () => {
-    tableRows.value.push({ exam1: '', count1: '', exam2: '', count2: '' });
+const addTableColumn = () => {
+    tableHeaders.value.push(`কলাম ${tableHeaders.value.length + 1}`);
+    tableMatrix.value.forEach(row => row.push(''));
 };
 
-const removeTableRow = (index) => {
-    tableRows.value.splice(index, 1);
+const removeTableColumn = (colIndex) => {
+    if (tableHeaders.value.length <= 1) return;
+    tableHeaders.value.splice(colIndex, 1);
+    tableMatrix.value.forEach(row => row.splice(colIndex, 1));
+};
+
+const addTableRow = () => {
+    tableMatrix.value.push(new Array(tableHeaders.value.length).fill(''));
+};
+
+const removeTableRow = (rowIndex) => {
+    if (tableMatrix.value.length <= 1) return;
+    tableMatrix.value.splice(rowIndex, 1);
 };
 
 const generateAndInsertTable = () => {
-    let html = '\n<table class="bcs-analysis-table">\n  <thead>\n    <tr><th>বিসিএস পরীক্ষা</th><th>প্রশ্ন সংখ্যা</th><th>বিসিএস পরীক্ষা</th><th>প্রশ্ন সংখ্যা</th></tr>\n  </thead>\n  <tbody>\n';
-    tableRows.value.forEach(r => {
-        html += `    <tr><td>${r.exam1 || '-'}</td><td>${r.count1 || '-'}</td><td>${r.exam2 || '-'}</td><td>${r.count2 || '-'}</td></tr>\n`;
+    let html = '\n<table class="bcs-analysis-table">\n  <tbody>\n    <tr class="table-header-row">\n';
+    tableHeaders.value.forEach(h => {
+        html += `      <td class="table-header-cell">${h || '-'}</td>\n`;
+    });
+    html += '    </tr>\n';
+    tableMatrix.value.forEach(row => {
+        html += '    <tr>\n';
+        row.forEach(cell => {
+            html += `      <td>${cell || '-'}</td>\n`;
+        });
+        html += '    </tr>\n';
     });
     html += '  </tbody>\n</table>\n';
-    materialForm.content += html;
+    insertHtmlToEditor(html);
     isTableBuilderOpen.value = false;
 };
 
@@ -171,7 +206,7 @@ const mathForm = ref({
 
 const generateAndInsertMath = () => {
     let html = `\n<div class="math-formula-box">\n$$\\text{${mathForm.value.title}} = \\frac{\\text{${mathForm.value.numerator}}}{\\text{${mathForm.value.denominator}}}$$\n</div>\n`;
-    materialForm.content += html;
+    insertHtmlToEditor(html);
     isMathBuilderOpen.value = false;
 };
 
@@ -680,120 +715,194 @@ const updateAdSlot = (adSlot) => {
             </div>
 
             <!-- Material Content & Rich Formatting Toolbar Edit Modal -->
-            <div v-if="selectedChapterForMaterial" class="fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+            <!-- Book Material & Rich Editor Modal Dialog -->
+            <div v-if="selectedChapterForMaterial" class="fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 md:p-6">
                 <div
-                    class="bg-white dark:bg-slate-800 p-6 md:p-8 border border-gray-200 dark:border-slate-700 shadow-2xl space-y-4 overflow-y-auto transition-all duration-300"
+                    class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-2xl flex flex-col transition-all duration-300 overflow-hidden"
                     :class="[
                         isEditorFullscreen
-                            ? 'fixed inset-0 z-[10000] max-w-none max-h-none rounded-none h-screen w-screen p-6 md:p-10'
-                            : 'max-w-3xl max-h-[92vh] w-full rounded-3xl'
+                            ? 'fixed inset-0 z-[10000] max-w-none max-h-none rounded-none h-screen w-screen p-4 md:p-6'
+                            : 'max-w-4xl max-h-[92vh] w-full rounded-3xl p-5'
                     ]"
                 >
-                    <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-slate-700">
-                        <h3 class="text-xl font-bold">অধ্যায়: {{ selectedChapterForMaterial.title }} - পঠনসামগ্রী ও PDF</h3>
-                        
-                        <button
-                            @click="isEditorFullscreen = !isEditorFullscreen"
-                            type="button"
-                            class="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-xl text-xs font-extrabold flex items-center space-x-1 border border-indigo-200 dark:border-indigo-900"
-                        >
-                            <span>{{ isEditorFullscreen ? '🗗 ছোট স্ক্রিন' : '🖵 ফুল স্ক্রিন মোড' }}</span>
-                        </button>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-xs font-bold mb-1.5">বইয়ের PDF লিঙ্ক / URL (ঐচ্ছিক):</label>
-                        <input
-                            v-model="materialForm.pdf_file_path"
-                            type="url"
-                            placeholder="https://example.com/books/primary-bangla.pdf"
-                            class="w-full px-3 py-2 bg-gray-50 dark:bg-slate-900 border rounded-xl text-xs"
-                        />
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold mb-1.5">বইয়ের মতো সুন্দর করে সাজানোর সরঞ্জাম (Formatting Toolbar):</label>
-                        
-                        <!-- Rich Book Formatting Quick Action Toolbar -->
-                        <div class="mb-2 flex flex-wrap items-center gap-1.5 p-2 bg-gray-100 dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700">
-                            <button @click="insertFormatting('h1')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50" title="বড় হেডিং">
-                                <Heading1 class="w-3.5 h-3.5 text-indigo-600" />
-                                <span>H1 হেডিং</span>
-                            </button>
-                            <button @click="insertFormatting('h2')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50" title="ছোট হেডিং">
-                                <Heading2 class="w-3.5 h-3.5 text-indigo-600" />
-                                <span>H2 হেডিং</span>
-                            </button>
-                            <button @click="insertFormatting('bold')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50" title="হাইলাইট বোল্ড">
-                                <Bold class="w-3.5 h-3.5 text-indigo-600" />
-                                <span>বোল্ড</span>
-                            </button>
-                            <button @click="insertFormatting('list')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50" title="পয়েন্ট তালিকা">
-                                <List class="w-3.5 h-3.5 text-indigo-600" />
-                                <span>পয়েন্ট</span>
-                            </button>
-                            <button @click="insertFormatting('alert')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50 text-amber-600" title="হাইলাইট নোট">
-                                <AlertCircle class="w-3.5 h-3.5" />
-                                <span>নোট বক্স</span>
-                            </button>
-                            <button @click="insertFormatting('page')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50 text-purple-600" title="নতুন পৃষ্ঠা">
-                                <Scissors class="w-3.5 h-3.5" />
-                                <span>নতুন পৃষ্ঠা</span>
-                            </button>
-                            <button @click="insertFormatting('book_ribbon')" type="button" class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 rounded-lg text-xs font-bold text-indigo-700 dark:text-indigo-300" title="বুক রিবন হেডার">
-                                <span>📜 বুক রিবন হেডার</span>
-                            </button>
-                            <button @click="insertFormatting('math_lcm')" type="button" class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 rounded-lg text-xs font-bold text-emerald-700 dark:text-emerald-300" title="ল.সা.গু/গ.সা.গু সুত্র">
-                                <span>📐 ল.সা.গু/গ.সা.গু সুত্র</span>
-                            </button>
-                            <button @click="insertFormatting('fraction')" type="button" class="px-2.5 py-1 bg-blue-50 dark:bg-blue-950 border border-blue-200 rounded-lg text-xs font-bold text-blue-700 dark:text-blue-300" title="ভগ্নাংশ \frac{a}{b}">
-                                <span>➗ ভগ্নাংশ</span>
-                            </button>
-                            <button @click="insertFormatting('sqrt')" type="button" class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950 border border-amber-200 rounded-lg text-xs font-bold text-amber-700 dark:text-amber-300" title="বর্গমূল \sqrt{x}">
-                                <span>√ বর্গমূল</span>
-                            </button>
-                            <button @click="isTableBuilderOpen = true" type="button" class="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-extrabold flex items-center space-x-1 shadow-md" title="কোড ছাড়াই গ্রাফিক্যাল বিসিএস গ্রিড টেবিল তৈরি করুন">
-                                <span>✨ 📊 গ্রাফিক্যাল টেবিল বিল্ডার</span>
-                            </button>
-                            <button @click="isMathBuilderOpen = true" type="button" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-extrabold flex items-center space-x-1 shadow-md" title="কোড ছাড়াই ম্যাথ সূত্র তৈরি করুন">
-                                <span>✨ 📐 গ্রাফিক্যাল ম্যাথ বিল্ডার</span>
-                            </button>
-                            <button @click="insertFormatting('2col')" type="button" class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950 border border-rose-200 rounded-lg text-xs font-bold text-rose-700 dark:text-rose-300" title="২-কলাম বই লেআউট">
-                                <span>📰 ২-কলাম বই লেআউট</span>
+                    <!-- Fixed Modal Header & Pinned Toolbar (STRICTLY PINNED AT TOP) -->
+                    <div class="flex-shrink-0 space-y-3 pb-3 border-b border-gray-200 dark:border-slate-700">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-slate-100">অধ্যায়: {{ selectedChapterForMaterial.title }} - পঠনসামগ্রী ও PDF</h3>
+                            
+                            <button
+                                @click="isEditorFullscreen = !isEditorFullscreen"
+                                type="button"
+                                class="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-xl text-xs font-extrabold flex items-center space-x-1 border border-indigo-200 dark:border-indigo-900"
+                            >
+                                <span>{{ isEditorFullscreen ? '🗗 ছোট স্ক্রিন' : '🖵 ফুল স্ক্রিন মোড' }}</span>
                             </button>
                         </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold mb-1">বইয়ের PDF লিঙ্ক / URL (ঐচ্ছিক):</label>
+                                <input
+                                    v-model="materialForm.pdf_file_path"
+                                    type="url"
+                                    placeholder="https://example.com/books/primary-bangla.pdf"
+                                    class="w-full px-3 py-1.5 bg-gray-50 dark:bg-slate-900 border rounded-xl text-xs"
+                                />
+                            </div>
+                        </div>
 
-                        <!-- MS Word-like WYSIWYG Rich Text Editor Component -->
-                        <RichTextEditor v-model="materialForm.content" />
+                        <!-- Rich Book Formatting Pinned Action Toolbar -->
+                        <div class="bg-gray-50 dark:bg-slate-900/90 p-2 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm space-y-1">
+                            <label class="block text-[11px] font-extrabold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider">
+                                🛠️ বইয়ের সাজানোর টুলবার (ALWAYS FIXED PINNED AT TOP):
+                            </label>
+                            
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <button @click="insertFormatting('h1')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50" title="বড় হেডিং">
+                                    <Heading1 class="w-3.5 h-3.5 text-indigo-600" />
+                                    <span>H1 হেডিং</span>
+                                </button>
+                                <button @click="insertFormatting('h2')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50" title="ছোট হেডিং">
+                                    <Heading2 class="w-3.5 h-3.5 text-indigo-600" />
+                                    <span>H2 হেডিং</span>
+                                </button>
+                                <button @click="insertFormatting('bold')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50" title="হাইলাইট বোল্ড">
+                                    <Bold class="w-3.5 h-3.5 text-indigo-600" />
+                                    <span>বোল্ড</span>
+                                </button>
+                                <button @click="insertFormatting('list')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50" title="পয়েন্ট তালিকা">
+                                    <List class="w-3.5 h-3.5 text-indigo-600" />
+                                    <span>পয়েন্ট</span>
+                                </button>
+                                <button @click="insertFormatting('alert')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50 text-amber-600" title="হাইলাইট নোট">
+                                    <AlertCircle class="w-3.5 h-3.5" />
+                                    <span>নোট বক্স</span>
+                                </button>
+                                <button @click="insertFormatting('page')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50 text-purple-600" title="নতুন পৃষ্ঠা">
+                                    <Scissors class="w-3.5 h-3.5" />
+                                    <span>নতুন পৃষ্ঠা</span>
+                                </button>
+                                <button @click="insertFormatting('book_ribbon')" type="button" class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 rounded-lg text-xs font-bold text-indigo-700 dark:text-indigo-300" title="বুক রিবন হেডার">
+                                    <span>📜 বুক রিবন হেডার</span>
+                                </button>
+                                <button @click="insertFormatting('math_lcm')" type="button" class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 rounded-lg text-xs font-bold text-emerald-700 dark:text-emerald-300" title="ল.সা.গু/গ.সা.গু সুত্র">
+                                    <span>📐 ল.সা.গু/গ.সা.গু সুত্র</span>
+                                </button>
+                                <button @click="insertFormatting('fraction')" type="button" class="px-2.5 py-1 bg-blue-50 dark:bg-blue-950 border border-blue-200 rounded-lg text-xs font-bold text-blue-700 dark:text-blue-300" title="ভগ্নাংশ \frac{a}{b}">
+                                    <span>➗ ভগ্নাংশ</span>
+                                </button>
+                                <button @click="insertFormatting('sqrt')" type="button" class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950 border border-amber-200 rounded-lg text-xs font-bold text-amber-700 dark:text-amber-300" title="বর্গমূল \sqrt{x}">
+                                    <span>√ বর্গমূল</span>
+                                </button>
+                                <button @click="isTableBuilderOpen = true" type="button" class="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-extrabold flex items-center space-x-1 shadow-md" title="কোড ছাড়াই গ্রাফিক্যাল বিসিএস গ্রিড টেবিল তৈরি করুন">
+                                    <span>✨ 📊 গ্রাফিক্যাল টেবিল বিল্ডার</span>
+                                </button>
+                                <button @click="isMathBuilderOpen = true" type="button" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-extrabold flex items-center space-x-1 shadow-md" title="কোড ছাড়াই ম্যাথ সূত্র তৈরি করুন">
+                                    <span>✨ 📐 গ্রাফিক্যাল ম্যাথ বিল্ডার</span>
+                                </button>
+                                <button @click="insertFormatting('2col')" type="button" class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950 border border-rose-200 rounded-lg text-xs font-bold text-rose-700 dark:text-rose-300" title="২-কলাম বই লেআউট">
+                                    <span>📰 ২-কলাম লেআউট</span>
+                                </button>
+                                <button @click="insertFormatting('3col_model_test')" type="button" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-extrabold flex items-center space-x-1 shadow-md" title="৩-কলাম বিসিএস মডেল টেস্ট ও উত্তরপত্র গ্রিড ইনসার্ট করুন">
+                                    <span>✨ 📰 ৩-কলাম মডেল টেস্ট বিল্ডার</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="flex items-center justify-end space-x-2">
+                    <!-- Scrollable Text Area Container (ONLY THIS AREA SCROLLS) -->
+                    <div class="flex-1 overflow-y-auto py-3 space-y-3">
+                        <!-- MS Word-like WYSIWYG Rich Text Editor Component -->
+                        <RichTextEditor ref="richEditorRef" v-model="materialForm.content" />
+                    </div>
+
+                    <!-- Modal Footer Actions (Fixed at bottom) -->
+                    <div class="flex-shrink-0 pt-3 border-t border-gray-200 dark:border-slate-700 flex items-center justify-end space-x-2">
                         <button @click="selectedChapterForMaterial = null" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl text-xs font-bold">বাতিল</button>
                         <button @click="saveMaterial" class="px-5 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold">সেভ করুন</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Graphical Table Builder Modal (No HTML Code Needed!) -->
+            <!-- Graphical Dynamic Table Builder Modal (Full Column & Row Control) -->
             <div v-if="isTableBuilderOpen" class="fixed inset-0 z-[10000] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-                <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl max-w-lg w-full border border-gray-200 dark:border-slate-700 shadow-2xl space-y-4">
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl max-w-3xl w-full border border-gray-200 dark:border-slate-700 shadow-2xl space-y-4">
                     <div class="flex items-center justify-between pb-3 border-b">
-                        <h3 class="text-lg font-bold">📊 বিসিএস প্রশ্ন সংখ্যা বিশ্লেষণ টেবিল বিল্ডার</h3>
-                        <button @click="isTableBuilderOpen = false" class="text-gray-400">✕</button>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-slate-100">📊 ডাইনামিক কলাম ও সারি টেবিল বিল্ডার</h3>
+                            <p class="text-xs text-gray-500">আপনার ইচ্ছামতো কলাম ও সারি যোগ/মুছে টেবিল তৈরি করুন</p>
+                        </div>
+                        <button @click="isTableBuilderOpen = false" class="text-gray-400 hover:text-gray-600">✕</button>
                     </div>
 
-                    <div class="space-y-3 max-h-[60vh] overflow-y-auto">
-                        <div v-for="(row, idx) in tableRows" :key="idx" class="p-3 bg-gray-50 dark:bg-slate-900 rounded-xl border flex items-center justify-between gap-2 text-xs">
-                            <input v-model="row.exam1" placeholder="পরীক্ষা ১ (যেমন: ৫০তম)" class="w-1/4 px-2 py-1 border rounded" />
-                            <input v-model="row.count1" placeholder="প্রশ্ন (২টি)" class="w-1/4 px-2 py-1 border rounded" />
-                            <input v-model="row.exam2" placeholder="পরীক্ষা ২ (যেমন: ৪৯তম)" class="w-1/4 px-2 py-1 border rounded" />
-                            <input v-model="row.count2" placeholder="প্রশ্ন (১টি)" class="w-1/4 px-2 py-1 border rounded" />
-                            <button @click="removeTableRow(idx)" class="text-rose-600 font-bold px-1">✕</button>
+                    <!-- Column Controls Toolbar -->
+                    <div class="flex items-center justify-between p-3 bg-teal-50 dark:bg-teal-950/50 rounded-2xl border border-teal-200 dark:border-teal-900">
+                        <span class="text-xs font-bold text-teal-800 dark:text-teal-300">
+                            মোট কলাম: {{ tableHeaders.length }}টি | মোট সারি: {{ tableMatrix.length }}টি
+                        </span>
+                        <div class="flex items-center space-x-2">
+                            <button @click="addTableColumn" type="button" class="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl shadow-sm">
+                                + কলাম যোগ করুন
+                            </button>
+                            <button @click="addTableRow" type="button" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm">
+                                + সারি যোগ করুন
+                            </button>
                         </div>
+                    </div>
 
-                        <button @click="addTableRow" type="button" class="w-full py-2 bg-gray-100 dark:bg-slate-700 rounded-xl text-xs font-bold border border-dashed">
-                            + নতুন সারি যোগ করুন
-                        </button>
+                    <!-- Table Matrix Input Area -->
+                    <div class="overflow-x-auto max-h-[50vh] overflow-y-auto p-1 border rounded-2xl">
+                        <table class="w-full text-xs text-left border-collapse">
+                            <!-- Dynamic Table Headers -->
+                            <thead>
+                                <tr class="bg-gray-100 dark:bg-slate-900 border-b">
+                                    <th class="p-2 text-center text-gray-400 font-normal w-8">#</th>
+                                    <th v-for="(header, colIdx) in tableHeaders" :key="'h_'+colIdx" class="p-2 border-r">
+                                        <div class="flex items-center space-x-1">
+                                            <input
+                                                v-model="tableHeaders[colIdx]"
+                                                placeholder="কলামের নাম"
+                                                class="w-full px-2 py-1 bg-white dark:bg-slate-800 border rounded font-bold text-teal-700 dark:text-teal-300 text-xs"
+                                            />
+                                            <button
+                                                v-if="tableHeaders.length > 1"
+                                                @click="removeTableColumn(colIdx)"
+                                                type="button"
+                                                class="text-rose-500 hover:bg-rose-50 p-1 rounded font-bold"
+                                                title="এই কলামটি মুছুন"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    </th>
+                                    <th class="p-2 text-center w-10">মুছুন</th>
+                                </tr>
+                            </thead>
+                            <!-- Dynamic Table Matrix Rows -->
+                            <tbody>
+                                <tr v-for="(row, rowIdx) in tableMatrix" :key="'r_'+rowIdx" class="border-b hover:bg-gray-50/50 dark:hover:bg-slate-900/30">
+                                    <td class="p-2 text-center font-bold text-gray-400 text-[11px]">{{ rowIdx + 1 }}</td>
+                                    <td v-for="(cell, colIdx) in row" :key="'c_'+rowIdx+'_'+colIdx" class="p-1.5 border-r">
+                                        <input
+                                            v-model="tableMatrix[rowIdx][colIdx]"
+                                            placeholder="ডাটা লিখুন"
+                                            class="w-full px-2 py-1 bg-gray-50 dark:bg-slate-900 border rounded text-xs"
+                                        />
+                                    </td>
+                                    <td class="p-2 text-center">
+                                        <button
+                                            v-if="tableMatrix.length > 1"
+                                            @click="removeTableRow(rowIdx)"
+                                            type="button"
+                                            class="text-rose-600 hover:bg-rose-50 p-1 rounded font-bold"
+                                            title="এই সারিটি মুছুন"
+                                        >
+                                            ✕
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <div class="flex items-center justify-end space-x-2 pt-2">

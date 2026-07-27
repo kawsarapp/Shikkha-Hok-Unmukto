@@ -87,33 +87,51 @@
     color: #F1F5F9;
 }
 
-/* BCS Analysis Table (Book Style) */
-.bcs-analysis-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1.25rem 0;
-    font-size: 0.9rem;
-    text-align: center;
-    font-family: var(--font-bengali);
+/* BCS Analysis Table (Book Style & Quill Friendly) */
+.bcs-analysis-table, table {
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    margin: 1.25rem 0 !important;
+    font-size: 0.9rem !important;
+    text-align: center !important;
+    font-family: var(--font-bengali) !important;
+    border-radius: 0.75rem !important;
+    overflow: hidden !important;
+    border: 1px solid #CBD5E1 !important;
 }
-.bcs-analysis-table th {
-    background-color: #CBD5E1;
-    color: #0F172A;
-    font-weight: 800;
-    border: 1px solid #64748B;
-    padding: 0.5rem;
+.dark .bcs-analysis-table, .dark table {
+    border-color: #334155 !important;
 }
-.dark .bcs-analysis-table th {
-    background-color: #334155;
-    color: #F8FAFC;
-    border-color: #475569;
+.bcs-analysis-table th, table th, .table-header-cell, td.table-header-cell {
+    background-color: #0F766E !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    border-bottom: 2px solid #0D9488 !important;
+    border-right: 1px solid #0D9488 !important;
+    padding: 0.6rem 0.8rem !important;
+    text-align: center !important;
 }
-.bcs-analysis-table td {
-    border: 1px solid #94A3B8;
-    padding: 0.4rem 0.6rem;
+.dark .bcs-analysis-table th, .dark table th, .dark .table-header-cell, .dark td.table-header-cell {
+    background-color: #115E59 !important;
+    color: #F8FAFC !important;
+    border-color: #0F766E !important;
 }
-.dark .bcs-analysis-table td {
-    border-color: #475569;
+.bcs-analysis-table td, table td {
+    border-bottom: 1px solid #E2E8F0 !important;
+    border-right: 1px solid #E2E8F0 !important;
+    padding: 0.5rem 0.75rem !important;
+    color: #1E293B !important;
+}
+.dark .bcs-analysis-table td, .dark table td {
+    border-color: #334155 !important;
+    color: #F1F5F9 !important;
+}
+.bcs-analysis-table tr:nth-child(even), table tr:nth-child(even) {
+    background-color: #F0FDF4 !important;
+}
+.dark .bcs-analysis-table tr:nth-child(even), .dark table tr:nth-child(even) {
+    background-color: #0F172A !important;
 }
 
 /* Math Formula & Fraction Callout Box */
@@ -136,11 +154,58 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.5rem;
+    margin: 1.25rem 0;
 }
 @media (min-width: 768px) {
     .book-2col {
         grid-template-columns: 1fr 1fr;
     }
+}
+
+/* Book 3-Column Layout Grid */
+.book-3col {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin: 1.25rem 0;
+}
+@media (min-width: 768px) {
+    .book-3col {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+/* OMR Answer Key & Explanation Grid Box */
+.omr-answer-key-box {
+    background-color: #F8FAFC;
+    border: 2px solid #0F766E;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+}
+.dark .omr-answer-key-box {
+    background-color: #0F172A;
+    border-color: #0D9488;
+}
+
+.omr-title {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #0F766E;
+    border-bottom: 2px solid #CCFBF1;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+.dark .omr-title {
+    color: #2DD4BF;
+    border-bottom-color: #115E59;
+}
+
+.omr-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    font-size: 0.875rem;
 }
 
 /* Book Reader Typography Styling */
