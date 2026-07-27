@@ -26,7 +26,7 @@ class QuizBattleController extends Controller
 
         if ($subject && $subject !== 'all') {
             $query->whereHas('chapter', function ($q) use ($subject) {
-                $q->where('subject_name', $subject);
+                $q->where('subject', $subject);
             });
         }
 
