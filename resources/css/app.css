@@ -298,3 +298,53 @@
     background-color: rgba(49, 46, 129, 0.4);
     border-left-color: #818CF8;
 }
+
+/* Quill Custom Bengali Font Classes */
+.ql-font-hind-siliguri, .ql-container .ql-font-hind-siliguri { font-family: 'Hind Siliguri', sans-serif !important; }
+.ql-font-noto-sans-bengali, .ql-container .ql-font-noto-sans-bengali { font-family: 'Noto Sans Bengali', sans-serif !important; }
+.ql-font-tiro-bangla, .ql-container .ql-font-tiro-bangla { font-family: 'Tiro Bangla', serif !important; }
+.ql-font-anek-bangla, .ql-container .ql-font-anek-bangla { font-family: 'Anek Bangla', sans-serif !important; }
+.ql-font-atma, .ql-container .ql-font-atma { font-family: 'Atma', cursive !important; }
+.ql-font-mina, .ql-container .ql-font-mina { font-family: 'Mina', sans-serif !important; }
+.ql-font-galada, .ql-container .ql-font-galada { font-family: 'Galada', cursive !important; }
+
+/* Set Bengali Font Picker Dropdown Labels in Quill Toolbar */
+.ql-snow .ql-picker.ql-font .ql-picker-label::before {
+    content: "হিন্দ শিলিগুড়ি (Default)" !important;
+    font-family: 'Hind Siliguri', sans-serif !important;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="hind-siliguri"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="hind-siliguri"]::before {
+    content: "হিন্দ শিলিগুড়ি (Hind Siliguri)" !important;
+    font-family: 'Hind Siliguri', sans-serif !important;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="noto-sans-bengali"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="noto-sans-bengali"]::before {
+    content: "নোতো সান্স বাংলা (Noto Sans)" !important;
+    font-family: 'Noto Sans Bengali', sans-serif !important;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="tiro-bangla"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="tiro-bangla"]::before {
+    content: "তিহো বাংলা (Tiro Classic)" !important;
+    font-family: 'Tiro Bangla', serif !important;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="anek-bangla"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="anek-bangla"]::before {
+    content: "অনেক বাংলা (Anek Bangla)" !important;
+    font-family: 'Anek Bangla', sans-serif !important;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="atma"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="atma"]::before {
+    content: "আত্মা স্টাইলিশ (Atma)" !important;
+    font-family: 'Atma', cursive !important;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="mina"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="mina"]::before {
+    content: "মীনা বোল্ড (Mina)" !important;
+    font-family: 'Mina', sans-serif !important;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="galada"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="galada"]::before {
+    content: "গলাদা ডিজাইন (Galada)" !important;
+    font-family: 'Galada', cursive !important;
+}

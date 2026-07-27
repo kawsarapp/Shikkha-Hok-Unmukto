@@ -751,61 +751,52 @@ const updateAdSlot = (adSlot) => {
                             </div>
                         </div>
 
-                        <!-- Rich Book Formatting Pinned Action Toolbar -->
-                        <div class="bg-gray-50 dark:bg-slate-900/90 p-2 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm space-y-1">
-                            <label class="block text-[11px] font-extrabold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider">
-                                🛠️ বইয়ের সাজানোর টুলবার (ALWAYS FIXED PINNED AT TOP):
-                            </label>
-                            
-                            <div class="flex flex-wrap items-center gap-1.5">
-                                <button @click="insertFormatting('h1')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50" title="বড় হেডিং">
-                                    <Heading1 class="w-3.5 h-3.5 text-indigo-600" />
-                                    <span>H1 হেডিং</span>
-                                </button>
-                                <button @click="insertFormatting('h2')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50" title="ছোট হেডিং">
-                                    <Heading2 class="w-3.5 h-3.5 text-indigo-600" />
-                                    <span>H2 হেডিং</span>
-                                </button>
-                                <button @click="insertFormatting('bold')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50" title="হাইলাইট বোল্ড">
-                                    <Bold class="w-3.5 h-3.5 text-indigo-600" />
-                                    <span>বোল্ড</span>
-                                </button>
-                                <button @click="insertFormatting('list')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50" title="পয়েন্ট তালিকা">
-                                    <List class="w-3.5 h-3.5 text-indigo-600" />
-                                    <span>পয়েন্ট</span>
-                                </button>
-                                <button @click="insertFormatting('alert')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50 text-amber-600" title="হাইলাইট নোট">
-                                    <AlertCircle class="w-3.5 h-3.5" />
-                                    <span>নোট বক্স</span>
-                                </button>
-                                <button @click="insertFormatting('page')" type="button" class="px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs font-bold flex items-center space-x-1 hover:bg-indigo-50 text-purple-600" title="নতুন পৃষ্ঠা">
-                                    <Scissors class="w-3.5 h-3.5" />
-                                    <span>নতুন পৃষ্ঠা</span>
-                                </button>
-                                <button @click="insertFormatting('book_ribbon')" type="button" class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 rounded-lg text-xs font-bold text-indigo-700 dark:text-indigo-300" title="বুক রিবন হেডার">
-                                    <span>📜 বুক রিবন হেডার</span>
-                                </button>
-                                <button @click="insertFormatting('math_lcm')" type="button" class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 rounded-lg text-xs font-bold text-emerald-700 dark:text-emerald-300" title="ল.সা.গু/গ.সা.গু সুত্র">
-                                    <span>📐 ল.সা.গু/গ.সা.গু সুত্র</span>
-                                </button>
-                                <button @click="insertFormatting('fraction')" type="button" class="px-2.5 py-1 bg-blue-50 dark:bg-blue-950 border border-blue-200 rounded-lg text-xs font-bold text-blue-700 dark:text-blue-300" title="ভগ্নাংশ \frac{a}{b}">
-                                    <span>➗ ভগ্নাংশ</span>
-                                </button>
-                                <button @click="insertFormatting('sqrt')" type="button" class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950 border border-amber-200 rounded-lg text-xs font-bold text-amber-700 dark:text-amber-300" title="বর্গমূল \sqrt{x}">
-                                    <span>√ বর্গমূল</span>
-                                </button>
-                                <button @click="isTableBuilderOpen = true" type="button" class="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-extrabold flex items-center space-x-1 shadow-md" title="কোড ছাড়াই গ্রাফিক্যাল বিসিএস গ্রিড টেবিল তৈরি করুন">
-                                    <span>✨ 📊 গ্রাফিক্যাল টেবিল বিল্ডার</span>
-                                </button>
-                                <button @click="isMathBuilderOpen = true" type="button" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-extrabold flex items-center space-x-1 shadow-md" title="কোড ছাড়াই ম্যাথ সূত্র তৈরি করুন">
-                                    <span>✨ 📐 গ্রাফিক্যাল ম্যাথ বিল্ডার</span>
-                                </button>
-                                <button @click="insertFormatting('2col')" type="button" class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950 border border-rose-200 rounded-lg text-xs font-bold text-rose-700 dark:text-rose-300" title="২-কলাম বই লেআউট">
-                                    <span>📰 ২-কলাম লেআউট</span>
-                                </button>
-                                <button @click="insertFormatting('3col_model_test')" type="button" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-extrabold flex items-center space-x-1 shadow-md" title="৩-কলাম বিসিএস মডেল টেস্ট ও উত্তরপত্র গ্রিড ইনসার্ট করুন">
-                                    <span>✨ 📰 ৩-কলাম মডেল টেস্ট বিল্ডার</span>
-                                </button>
+                        <!-- Rich Book Formatting Pinned Action Toolbar (Categorized MS Word Ribbon Layout) -->
+                        <div class="bg-gray-50 dark:bg-slate-900/90 p-2.5 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm space-y-2">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-[11px] font-extrabold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider">
+                                    🛠️ বইয়ের সাজানোর সরঞ্জাম (MS Word Ribbon Categorized Toolbar):
+                                </label>
+                                <span class="text-[10px] bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-extrabold px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">
+                                    📌 Pinned Sticky
+                                </span>
+                            </div>
+
+                            <!-- Categorized Ribbon Groups -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+                                <!-- Group 1: Book Formatting -->
+                                <div class="p-2 bg-white dark:bg-slate-800 rounded-xl border border-indigo-100 dark:border-slate-700 space-y-1">
+                                    <span class="text-[10px] font-extrabold text-indigo-600 dark:text-indigo-300 uppercase block">📖 ১. টেক্সট ও হেডার:</span>
+                                    <div class="flex flex-wrap gap-1">
+                                        <button @click="insertFormatting('h1')" type="button" class="px-2 py-0.5 bg-gray-50 dark:bg-slate-900 border rounded text-[11px] font-bold hover:bg-indigo-50">H1 হেডিং</button>
+                                        <button @click="insertFormatting('h2')" type="button" class="px-2 py-0.5 bg-gray-50 dark:bg-slate-900 border rounded text-[11px] font-bold hover:bg-indigo-50">H2 হেডিং</button>
+                                        <button @click="insertFormatting('bold')" type="button" class="px-2 py-0.5 bg-gray-50 dark:bg-slate-900 border rounded text-[11px] font-bold hover:bg-indigo-50">বোল্ড</button>
+                                        <button @click="insertFormatting('list')" type="button" class="px-2 py-0.5 bg-gray-50 dark:bg-slate-900 border rounded text-[11px] font-bold hover:bg-indigo-50">পয়েন্ট</button>
+                                        <button @click="insertFormatting('alert')" type="button" class="px-2 py-0.5 bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900 rounded text-[11px] font-bold">নোট বক্স</button>
+                                        <button @click="insertFormatting('book_ribbon')" type="button" class="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900 rounded text-[11px] font-bold">📜 বুক রিবন</button>
+                                    </div>
+                                </div>
+
+                                <!-- Group 2: Math & Formulas -->
+                                <div class="p-2 bg-white dark:bg-slate-800 rounded-xl border border-emerald-100 dark:border-slate-700 space-y-1">
+                                    <span class="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-300 uppercase block">📐 ২. গণিত ও সমীকরণ:</span>
+                                    <div class="flex flex-wrap gap-1">
+                                        <button @click="insertFormatting('math_lcm')" type="button" class="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900 rounded text-[11px] font-bold">📐 ল.সা.গু</button>
+                                        <button @click="insertFormatting('fraction')" type="button" class="px-2 py-0.5 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900 rounded text-[11px] font-bold">➗ ভগ্নাংশ</button>
+                                        <button @click="insertFormatting('sqrt')" type="button" class="px-2 py-0.5 bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900 rounded text-[11px] font-bold">√ বর্গমূল</button>
+                                        <button @click="isMathBuilderOpen = true" type="button" class="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-extrabold shadow">✨ ম্যাথ বিল্ডার</button>
+                                    </div>
+                                </div>
+
+                                <!-- Group 3: Grids & Layouts -->
+                                <div class="p-2 bg-white dark:bg-slate-800 rounded-xl border border-purple-100 dark:border-slate-700 space-y-1">
+                                    <span class="text-[10px] font-extrabold text-purple-600 dark:text-purple-300 uppercase block">📰 ৩. টেবিল ও লেআউট:</span>
+                                    <div class="flex flex-wrap gap-1">
+                                        <button @click="isTableBuilderOpen = true" type="button" class="px-2 py-0.5 bg-teal-600 hover:bg-teal-700 text-white rounded text-[11px] font-extrabold shadow">✨ 📊 টেবিল বিল্ডার</button>
+                                        <button @click="insertFormatting('2col')" type="button" class="px-2 py-0.5 bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900 rounded text-[11px] font-bold">📰 ২-কলাম</button>
+                                        <button @click="insertFormatting('3col_model_test')" type="button" class="px-2 py-0.5 bg-purple-600 hover:bg-purple-700 text-white rounded text-[11px] font-extrabold shadow">✨ 📰 ৩-কলাম টেস্ট</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

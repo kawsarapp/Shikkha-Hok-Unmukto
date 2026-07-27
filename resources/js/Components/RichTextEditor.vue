@@ -34,7 +34,11 @@ const updateMetrics = () => {
 
 onMounted(() => {
     if (window.Quill && editorContainer.value) {
-        // Register custom Font Family and Size if available
+        // Register custom Bengali Font Family Whitelist
+        const Font = window.Quill.import('formats/font');
+        Font.whitelist = ['hind-siliguri', 'noto-sans-bengali', 'tiro-bangla', 'anek-bangla', 'atma', 'mina', 'galada'];
+        window.Quill.register(Font, true);
+
         quillInstance = new window.Quill(editorContainer.value, {
             theme: 'snow',
             placeholder: props.placeholder,
@@ -46,7 +50,7 @@ onMounted(() => {
                     userOnly: true,
                 },
                 toolbar: [
-                    [{ font: [] }, { size: ['small', false, 'large', 'huge'] }],
+                    [{ font: ['hind-siliguri', 'noto-sans-bengali', 'tiro-bangla', 'anek-bangla', 'atma', 'mina', 'galada'] }, { size: ['small', false, 'large', 'huge'] }],
                     [{ header: [1, 2, 3, false] }],
                     ['bold', 'italic', 'underline', 'strike'],
                     [{ color: [] }, { background: [] }],
