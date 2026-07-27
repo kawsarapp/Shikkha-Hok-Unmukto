@@ -1,13 +1,17 @@
 <script setup>
+import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link } from '@inertiajs/vue3';
 import { useAudioStore } from '@/Stores/useAudioStore';
-import { Trophy, CheckCircle, XCircle, Volume2, ArrowLeft, Award, Flame, Coins, Sparkles } from 'lucide-vue-next';
+import { Trophy, CheckCircle, XCircle, Volume2, ArrowLeft, Award, Flame, Coins, Sparkles, AlertTriangle, BookOpen, ArrowRight } from 'lucide-vue-next';
 
 const props = defineProps({
     attempt: Object,
     leaderboard: Array,
     userRank: Number,
+    scorePercentage: Number,
+    diagnosticReasons: Array,
+    recommendedChapters: Array,
 });
 
 const audioStore = useAudioStore();
@@ -96,6 +100,65 @@ const playExplanationAudio = (questionText, explanation) => {
                         <button @click="copyChallengeLink" type="button" class="px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white font-bold text-xs rounded-xl flex items-center space-x-1">
                             <span>🔗 লিংক কপি</span>
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Performance Diagnostic Report & Upgrade Action Plan -->
+            <div class="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-sm space-y-5">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-slate-100 flex items-center space-x-2">
+                        <AlertTriangle class="w-6 h-6 text-amber-500" />
+                        <span>📊 পারফরম্যান্স বিশ্লেষণ ও নম্বর কম হওয়ার কারণ</span>
+                    </h3>
+                    <span
+                        class="px-3 py-1 text-xs font-black rounded-full"
+                        :class="[
+                            (scorePercentage || 0) >= 90
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                                : (scorePercentage || 0) >= 70
+                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
+                                : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
+                        ]"
+                    >
+                        {{ (scorePercentage || 0) >= 90 ? '🏆 ক্যাডার লেভেল গ্রেড' : (scorePercentage || 0) >= 70 ? '🥈 সন্তোষজনক গ্রেড' : '⚠️ দুর্বল পারফরম্যান্স' }}
+                    </span>
+                </div>
+
+                <!-- Diagnostic Explanation Box -->
+                <div class="p-5 rounded-2xl border" :class="(scorePercentage || 0) >= 70 ? 'bg-emerald-50/50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900' : 'bg-rose-50/50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900'">
+                    <h4 class="font-extrabold text-sm mb-2" :class="(scorePercentage || 0) >= 70 ? 'text-emerald-800 dark:text-emerald-300' : 'text-rose-800 dark:text-rose-300'">
+                        {{ (scorePercentage || 0) >= 90 ? '🎉 চমৎকার প্রস্তুতি! আপনি মেধা তালিকার শীর্ষে রয়েছেন।' : (scorePercentage || 0) >= 70 ? '👍 ভালো প্রস্তুতি! তবে সামান্য কিছু ভুল শোধরালে শতভাগ নম্বর পাওয়া সম্ভব।' : '🚨 দুর্বল প্রস্তুতি! আপনার পাসমার্ক অর্জন করতে নিম্নোক্ত সংস্কার প্রয়োজন।' }}
+                    </h4>
+
+                    <!-- Specific Reasons List -->
+                    <div v-if="diagnosticReasons && diagnosticReasons.length" class="space-y-1.5 mt-3 text-xs">
+                        <span class="font-bold text-gray-700 dark:text-slate-300 block">নম্বর কম পাওয়ার প্রধান কারণসমূহ:</span>
+                        <div v-for="(reason, rIdx) in diagnosticReasons" :key="rIdx" class="flex items-start space-x-2 text-gray-600 dark:text-slate-400">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0"></span>
+                            <span>{{ reason }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommended Chapters to Re-read -->
+                <div v-if="recommendedChapters && recommendedChapters.length" class="space-y-3 pt-2">
+                    <h4 class="font-bold text-sm text-gray-900 dark:text-slate-100 flex items-center space-x-2">
+                        <BookOpen class="w-4 h-4 text-indigo-600" />
+                        <span>📖 যে অধ্যায়গুলো এখনই আবার পড়া উচিত (Upgrade Action Plan):</span>
+                    </h4>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div v-for="rc in recommendedChapters" :key="rc.id" class="p-4 bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <h5 class="font-bold text-xs text-indigo-950 dark:text-indigo-200">{{ rc.title }}</h5>
+                                <span class="text-[11px] text-rose-600 font-bold">ভুল উত্তর: {{ rc.wrong_count }}টি প্রশ্ন</span>
+                            </div>
+                            <Link :href="`/chapter/${rc.id}`" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs rounded-xl flex items-center space-x-1 shadow-sm">
+                                <span>পুনরায় পড়ুন</span>
+                                <ArrowRight class="w-3.5 h-3.5" />
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>

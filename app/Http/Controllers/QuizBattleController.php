@@ -11,14 +11,35 @@ use Inertia\Response;
 
 class QuizBattleController extends Controller
 {
-    public function show(): Response
+    public function show(Request $request): Response
     {
         $user = Auth::user();
 
-        // Select 5 random questions for the 1v1 battle
-        $questions = Question::inRandomOrder()
-            ->take(5)
+        $count = (int) $request->input('count', 5);
+        if (!in_array($count, [5, 10, 15, 20, 25])) {
+            $count = 5;
+        }
+
+        $subject = $request->input('subject', null);
+
+        $query = Question::query();
+
+        if ($subject && $subject !== 'all') {
+            $query->whereHas('chapter', function ($q) use ($subject) {
+                $q->where('subject_name', $subject);
+            });
+        }
+
+        $questions = $query->inRandomOrder()
+            ->take($count)
             ->get(['id', 'question_text', 'options', 'correct_option_index', 'explanation']);
+
+        // Fallback if requested subject questions are fewer than count
+        if ($questions->count() < $count) {
+            $questions = Question::inRandomOrder()
+                ->take($count)
+                ->get(['id', 'question_text', 'options', 'correct_option_index', 'explanation']);
+        }
 
         // Generate dynamic AI rival opponent
         $opponents = [
@@ -26,6 +47,7 @@ class QuizBattleController extends Controller
             ['name' => 'সাদিয়া তাসনিম', 'title' => 'রাজশাহী বিশ্ববিদ্যালয় • প্রাইমারি ক্যান্ডিডেট', 'avatar' => '👩‍🎓', 'skill' => 'Medium'],
             ['name' => 'আরিফুল ইসলাম', 'title' => 'চট্টগ্রাম বিশ্ববিদ্যালয় • ব্যাংক জব ক্যান্ডিডেট', 'avatar' => '👨‍💼', 'skill' => 'High'],
             ['name' => 'নাসরিন আক্তার', 'title' => 'জাহাঙ্গীরনগর বিশ্ববিদ্যালয় • শিক্ষক পরীক্ষার্থী', 'avatar' => '👩‍🏫', 'skill' => 'Medium'],
+            ['name' => 'মাহমুদুল হাসান', 'title' => 'বুয়েট • ৯ম গ্রেড সরকারি চাকরিপ্রার্থী', 'avatar' => '👨‍💻', 'skill' => 'Pro'],
         ];
 
         $opponent = $opponents[array_rand($opponents)];
@@ -34,14 +56,17 @@ class QuizBattleController extends Controller
             'questions' => $questions,
             'opponent' => $opponent,
             'user' => $user,
+            'selectedCount' => $count,
+            'selectedSubject' => $subject ?: 'all',
         ]);
     }
 
     public function submit(Request $request)
     {
         $request->validate([
-            'user_score' => 'required|integer|min:0|max:5',
-            'opponent_score' => 'required|integer|min:0|max:5',
+            'user_score' => 'required|integer|min:0',
+            'opponent_score' => 'required|integer|min:0',
+            'total_questions' => 'nullable|integer|min:1',
         ]);
 
         $user = Auth::user();

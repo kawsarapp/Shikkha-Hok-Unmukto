@@ -186,18 +186,56 @@ class ExamController extends Controller
     }
 
     /**
-     * Display Exam Result and Leaderboard
+     * Display Exam Result, Smart Performance Diagnosis, and Leaderboard
      */
     public function result(ExamAttempt $attempt): Response
     {
-        $attempt->load(['exam.chapter', 'answers.question']);
+        $attempt->load(['exam.chapter', 'answers.question.chapter']);
         $leaderboard = $this->leaderboardService->getTopRanks($attempt->exam_id);
         $userRank = $this->leaderboardService->getUserRank($attempt->exam_id, $attempt->user_id);
+
+        $totalQuestions = max(1, $attempt->answers->count());
+        $scorePercentage = (int) round(($attempt->score / $totalQuestions) * 100);
+
+        // Analyze wrong answers to find weak chapters & diagnostic reasons
+        $wrongAnswers = $attempt->answers->where('is_correct', false);
+        $weakChapters = [];
+        $diagnosticReasons = [];
+
+        if ($attempt->wrong_count > 0) {
+            $diagnosticReasons[] = "নেগেটিভ মার্কিংয়ের কারণে " . ($attempt->wrong_count * ($attempt->exam?->negative_mark_value ?? 0.25)) . " নম্বর কাটা গেছে।";
+        }
+
+        foreach ($wrongAnswers as $wa) {
+            if ($wa->question?->chapter) {
+                $chId = $wa->question->chapter->id;
+                if (!isset($weakChapters[$chId])) {
+                    $weakChapters[$chId] = [
+                        'id' => $chId,
+                        'title' => $wa->question->chapter->title,
+                        'wrong_count' => 0,
+                    ];
+                }
+                $weakChapters[$chId]['wrong_count']++;
+            }
+        }
+
+        if (count($weakChapters) > 0) {
+            $topWeakChapter = collect($weakChapters)->sortByDesc('wrong_count')->first();
+            $diagnosticReasons[] = "'{$topWeakChapter['title']}' টপিকে মূল তথ্যের ধারণার ঘাটতি রয়েছে।";
+        }
+
+        if ($scorePercentage < 70) {
+            $diagnosticReasons[] = "বিসিএস পাসমার্ক (৭০%) এর চেয়ে নম্বর কম পাওয়া গেছে। রিভিশন প্রয়োজন।";
+        }
 
         return Inertia::render('Exam/Result', [
             'attempt' => $attempt,
             'leaderboard' => $leaderboard,
             'userRank' => $userRank,
+            'scorePercentage' => $scorePercentage,
+            'diagnosticReasons' => $diagnosticReasons,
+            'recommendedChapters' => array_values($weakChapters),
         ]);
     }
 }
